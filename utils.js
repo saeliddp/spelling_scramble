@@ -39,5 +39,50 @@ function pickLetters(numVowels, numConsonants) {
   return output;
 }
 
+function arrayToString(arr) {
+  output = "[";
+  for (let elem of arr) {
+    output += '"' + elem + '",'
+  }
+  output = output.substring(0, output.length - 1) + "]";
+  return output;
+}
+
+function selectPrimaryLetter(arr) {
+  lists = {};
+  let maxCount = 0;
+  let maxLetter = '-';
+  for (let word of arr) {
+    for (let i = 0; i < word.length; i++) {
+      if (!(word[i] in lists)) {
+        lists[word[i]] = [word];
+      } else {
+        let currList = lists[word[i]];
+        if (currList[currList.length - 1] !== word) {
+          currList.push(word);
+          if (currList.length > maxCount) {
+            maxCount = currList.length;
+            maxLetter = word[i];
+          }
+        }
+      }
+    }
+  }
+  return {'primaryLetter': maxLetter, 'wordList': lists[maxLetter]};
+}
+
+function pruneVocab(wordList, minLength) {
+  let prunedVocab = [];
+  for (let word of wordList) {
+    if (isLowerAlphabetic(word) && word.length >= minLength) {
+      prunedVocab.push(word);
+    }
+  }
+  return prunedVocab;
+}
+
 exports.isLowerAlphabetic = isLowerAlphabetic;
 exports.pickLetters = pickLetters;
+exports.arrayToString = arrayToString;
+exports.selectPrimaryLetter = selectPrimaryLetter;
+exports.pruneVocab = pruneVocab;

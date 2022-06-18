@@ -1,4 +1,66 @@
+<!DOCTYPE html>
 <html>
-  <h1>{{letters}}</h1>
-  <h1>{{all_words}}</h1>
+  <head>
+    <script>
+      let allLetters = {{letters}};
+      let allWords = {{all_words}};
+      let primaryLetter = "{{primary}}";
+      let minLength = {{minLength}};
+
+      let allWordsSet = new Set();
+      for (let i = 0; i < allWords.length; i++) {
+        allWordsSet.add(allWords[i]);
+      }
+
+      let guessedAlready = new Set();
+      let points = 0;
+
+      function setLetters() {
+        document.getElementById("letters").innerHTML = allLetters.toString();
+      }
+
+      function setPrimary() {
+        document.getElementById("primary").innerHTML = primaryLetter;
+      }
+
+      function setPoints(points) {
+        document.getElementById("points").innerHTML = "Points: " + points;
+      }
+
+      function setFeedback(fdb) {
+        document.getElementById("feedback").innerHTML = fdb;
+      }
+
+      function makeGuess() {
+        let guess = document.getElementById("guess").value.toLowerCase();
+        if (guess.length < minLength) {
+          setFeedback("Word length must be at least " + minLength);
+        } else if (!guessedAlready.has(guess)) {
+          if (allWordsSet.has(guess)) {
+            guessedAlready.add(guess);
+            points += guess.length;
+            setPoints(points);
+            setFeedback("Nice work!");
+          } else if (!guess.includes(primaryLetter)) {
+            setFeedback("Remember to include '" + primaryLetter + "'");
+          } else {
+            setFeedback("'" + guess + "' is not a recognized word");
+          }
+        } else {
+          setFeedback("You've already guessed '" + guess + "'");
+        }
+        document.getElementById("guess").value = "";
+      }
+    </script>
+  </head>
+  <body onload="setLetters(); setPrimary()">
+    <h1 id="letters"></h1>
+    <h1 id="primary"></h1>
+    <h2 id="points">Points: 0</h2>
+    <form>
+      <input type="text" id="guess">
+      <input type="button" id="submit" value="Try Word" onclick="makeGuess()">
+    </form>
+    <h2 id="feedback"></h2>
+  </body>
 </html>
