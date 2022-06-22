@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <style>
+      .button-container {
+        width: 390px;
+        background: beige;
+        overflow-y: auto;
+      }
+      .button-container > input {
+        float: left;
+        width: 100px;
+        height: 100px;
+        background: white;
+        margin: 15px;
+        font-size: 50px;
+      }
+    </style>
     <script>
       let allLetters = {{letters}};
       let allWords = {{all_words}};
       let primaryLetter = "{{primary}}";
       let minLength = {{minLength}};
+      let buttonToLetter = {};
 
       let allWordsSet = new Set();
       for (let i = 0; i < allWords.length; i++) {
@@ -15,12 +31,32 @@
       let guessedAlready = new Set();
       let points = 0;
 
+      function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+      }
+
       function setLetters() {
-        document.getElementById("letters").innerHTML = allLetters.toString();
+        let letterIdx = 0;
+        for (let j = 0; j < 3; j++) { // columns
+          for (let i = 1; i < 3; i++) { // rows
+            if (allLetters[letterIdx] === primaryLetter) {
+              letterIdx++;
+            }
+            buttonToLetter[("" + i) + j] = allLetters[letterIdx];
+            document.getElementById(("" + i) + j).value = allLetters[letterIdx];
+            letterIdx++;
+          }
+        }
       }
 
       function setPrimary() {
-        document.getElementById("primary").innerHTML = primaryLetter;
+        document.getElementById("01").value = primaryLetter;
+        buttonToLetter["01"] = primaryLetter;
       }
 
       function setPoints(points) {
@@ -29,6 +65,18 @@
 
       function setFeedback(fdb) {
         document.getElementById("feedback").innerHTML = fdb;
+      }
+
+      function handleLetterButton(i, j) {
+        if (i > 0 || (i == 0 && j == 1)) {
+          let prevText = document.getElementById("guess").value;
+          document.getElementById("guess").value = prevText + buttonToLetter[(i + "") + j];
+        }
+      }
+
+      function shuffle() {
+        shuffleArray(allLetters);
+        setLetters();
       }
 
       function makeGuess() {
@@ -52,12 +100,23 @@
         document.getElementById("guess").value = "";
       }
     </script>
+    <title>Spelling</title>
   </head>
   <body onload="setLetters(); setPrimary()">
-    <h1 id="letters"></h1>
-    <h1 id="primary"></h1>
     <h2 id="points">Points: 0</h2>
     <form>
+      <div class="button-container">
+        <input type="button" id="00" onclick="handleLetterButton(0, 0)">
+        <input type="button" id="01" onclick="handleLetterButton(0, 1)" style="color:darksalmon;">
+        <input type="button" id="02" onclick="handleLetterButton(0, 2)">
+        <input type="button" id="10" onclick="handleLetterButton(1, 0)">
+        <input type="button" id="11" onclick="handleLetterButton(1, 1)">
+        <input type="button" id="12" onclick="handleLetterButton(1, 2)">
+        <input type="button" id="20" onclick="handleLetterButton(2, 0)">
+        <input type="button" id="21" onclick="handleLetterButton(2, 1)">
+        <input type="button" id="22" onclick="handleLetterButton(2, 2)">
+      </div>
+      <input type="button" id="shuffleButton" value="Shuffle" onclick="shuffle()">
       <input type="text" id="guess">
       <input type="button" id="submit" value="Try Word" onclick="makeGuess()">
     </form>
